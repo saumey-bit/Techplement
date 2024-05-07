@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 350px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .weather-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .weather-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .city-name {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .temperature {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .weather-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+
+        .weather-description {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: center;
+        }
+
+        .weather-detail {
+            margin: 0 10px;
+        }
+
+        .sunny {
+            color: #FDB813;
+        }
+
+        .cloudy {
+            color: #7D7D7D;
+        }
+
+        .rainy {
+            color: #005AA7;
+        }
+
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+
+       
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const apiKey = '7de577edee7766cb3c125cade5f12946';
+            const cities = [
+                { id: '1275339', name: 'Mumbai' }, // Mumbai, India
+                { id: '2643743', name: 'London' }, // London, UK
+                { id: '5128581', name: 'New York' }, // New York, USA
+                { id: '1850147', name: 'Tokyo' }, // Tokyo, Japan
+                { id: '1276736', name: 'Basti' } // Basti, India
+               
+            ];
+
+            const container = document.querySelector('.container');
+
+            cities.forEach(city => {
+                fetch(`https://api.openweathermap.org/data/2.5/weather?id=${city.id}&appid=${apiKey}&units=metric`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const cityName = data.name;
+                        const temperature = data.main.temp;
+                        const description = data.weather[0].description;
+                        const iconCode = data.weather[0].icon;
+                        const humidity = data.main.humidity;
+                        const windSpeed = data.wind.speed;
+                        const backgroundUrl = `https://source.unsplash.com/1600x900/?${description}`;
+
+                        const weatherCard = document.createElement('div');
+                        weatherCard.classList.add('weather-card');
+                        weatherCard.innerHTML = `
+                            <div class="background-overlay" style="background-image: url('${backgroundUrl}')"></div>
+                            <h2 class="city-name">${cityName}</h2>
+                            <img class="weather-icon" src="http://openweathermap.org/img/wn/${iconCode}.png" alt="Weather Icon">
+                            <p class="temperature">${temperature}°C</p>
+                            <p class="weather-description">${description}</p>
+                            <div class="weather-details">
+                                <div class="weather-detail">
+                                    <strong>Humidity:</strong> <span class="humidity">${humidity}%</span>
+                                </div>
+                                <div class="weather-detail">
+                                    <strong>Wind:</strong> <span class="wind">${windSpeed} m/s</span>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(weatherCard);
+
+                        
+                        if (description.includes('clear')) {
+                            weatherCard.classList.add('sunny');
+                        } else if (description.includes('cloud')) {
+                            weatherCard.classList.add('cloudy');
+                        } else if (description.includes('rain')) {
+                            weatherCard.classList.add('rainy');
+                        }
+                    })
+                    .catch(error => console.error('Error fetching weather data:', error));
+            });
+        });
+    </script>
+</body>
+</html>
